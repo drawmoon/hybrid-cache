@@ -1,0 +1,5 @@
+allprojects {
+  description = 'A hybrid caching library'
+  group = 'org.hybridcache'
+  version = '0.0.1'
+}
