@@ -29,7 +29,7 @@ public class HybridCache implements AutoCloseable {
     // Redis 连接。
     private StatefulRedisConnection<byte[], byte[]> statefulRedisConnection;
     // Redis 是可用的。
-    private boolean redisAvailabled = false;
+    private boolean redisAvailable = false;
 
     /**
      * 创建一个新的混合缓存实例。
@@ -43,14 +43,12 @@ public class HybridCache implements AutoCloseable {
      * @param optionsAction 用于配置混合缓存。
      */
     public HybridCache(Consumer<HybridCacheOptions> optionsAction) {
-        this(Optional.ofNullable(optionsAction).map(x -> {
-            HybridCacheOptions options = new HybridCacheOptions();
-            if (optionsAction != null) {
-                optionsAction.accept(options);
-            }
-
-            return options;
-        }).get());
+        this(Optional.ofNullable(optionsAction)
+            .map(x -> {
+                HybridCacheOptions options = new HybridCacheOptions();
+                x.accept(options);
+                return options;
+            }).orElseGet(HybridCacheOptions::new));
     }
 
     /**
@@ -67,7 +65,7 @@ public class HybridCache implements AutoCloseable {
             RedisCacheOptions redisCacheOptions = options.getRedisCacheOptions();
             this.redisClient = RedisClient.create("redis://" + redisCacheOptions.getConfiguration());
             this.statefulRedisConnection = redisClient.connect(new ByteArrayCodec());
-            this.redisAvailabled = this.statefulRedisConnection.isOpen();
+            this.redisAvailable = this.statefulRedisConnection.isOpen();
         } catch (Exception e) {
             // ignore
         }
@@ -84,7 +82,7 @@ public class HybridCache implements AutoCloseable {
             return completableFuture.join();
         }
 
-        if (redisAvailabled) {
+        if (redisAvailable) {
             RedisFuture<byte[]> redisFuture = this.statefulRedisConnection.async().get(key.getBytes(StandardCharsets.UTF_8));
             if (redisFuture != null) {
                 try {
@@ -145,7 +143,7 @@ public class HybridCache implements AutoCloseable {
         assert !place.equals(HybridCachePlace.AUTO);
 
         if (place.equals(HybridCachePlace.DISTRIBUTED)) {
-            if (redisAvailabled) {
+            if (redisAvailable) {
                 RedisAsyncCommands<byte[], byte[]> asyncCommands = this.statefulRedisConnection.async();
                 SetArgs setArgs = SetArgs.Builder
                     .ex(entryOptions.getAbsoluteExpiration());
@@ -166,7 +164,7 @@ public class HybridCache implements AutoCloseable {
             return;
         }
 
-        if (redisAvailabled) {
+        if (redisAvailable) {
             RedisAsyncCommands<byte[], byte[]> asyncCommands = this.statefulRedisConnection.async();
             asyncCommands.expire(key.getBytes(StandardCharsets.UTF_8), 60);
         }
@@ -179,7 +177,7 @@ public class HybridCache implements AutoCloseable {
     public void remove(String key) {
         this.memoryCache.synchronous().invalidate(key);
 
-        if (redisAvailabled) {
+        if (redisAvailable) {
             RedisAsyncCommands<byte[], byte[]> asyncCommands = this.statefulRedisConnection.async();
             asyncCommands.del(key.getBytes(StandardCharsets.UTF_8));
         }
@@ -236,7 +234,7 @@ public class HybridCache implements AutoCloseable {
     // Closes this resource, relinquishing any underlying resources.
     @Override
     public void close() {
-        if (this.statefulRedisConnection != null && redisAvailabled) {
+        if (this.statefulRedisConnection != null && redisAvailable) {
             this.statefulRedisConnection.close();
         }
         if (this.redisClient != null) {

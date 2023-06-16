@@ -41,4 +41,11 @@ public class HybridStoreOption {
     @Getter
     @Setter
     private String bucket;
+
+    /**
+     * 
+     */
+    @Getter
+    @Setter
+    private String baseDir;
 }

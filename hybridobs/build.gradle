@@ -17,6 +17,9 @@ repositories {
 }
 
 dependencies {
+    // Use Minio library.
+    implementation 'io.minio:minio:8.3.6'
+
     // Use Lombok library.
     compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
