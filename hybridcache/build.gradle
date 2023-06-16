@@ -22,8 +22,8 @@ dependencies {
 
     // Use Caffeine cache library.
     implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
-    // Use Jedis cache library.
-    implementation 'redis.clients:jedis:4.4.3'
+    // Use Lettuce cache library.
+    implementation 'io.lettuce:lettuce-core:6.2.4.RELEASE'
 
     // Use Lombok library.
     compileOnly 'org.projectlombok:lombok:1.18.20'

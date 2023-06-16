@@ -17,6 +17,10 @@ repositories {
 }
 
 dependencies {
+    // Use Lombok library.
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+
     // Use JUnit test framework.
     testImplementation 'junit:junit:4.13.2'
 }

@@ -5,6 +5,13 @@ import lombok.Setter;
 
 public class HybridCacheEntryOptions {
     /**
+     * 缓存项的绝对到期日。
+     */
+    @Getter
+    @Setter
+    private long absoluteExpiration = 30;
+
+    /**
      * 缓存项的优先级。
      */
     @Getter

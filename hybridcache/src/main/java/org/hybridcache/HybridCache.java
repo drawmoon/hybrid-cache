@@ -1,27 +1,56 @@
 package org.hybridcache;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import org.hybridcache.utils.TypeUtils;
 
 import com.github.benmanes.caffeine.cache.AsyncCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisFuture;
+import io.lettuce.core.SetArgs;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.async.RedisAsyncCommands;
+import io.lettuce.core.codec.ByteArrayCodec;
+
 /**
  * 一个混合缓存，它将数据存储在内存、磁盘、分布式对象存储和分布式缓存上。
  */
-public class HybridCache {
-    /**
-     * 用于在内存中存储数据的异步缓存对象。
-     */
+public class HybridCache implements AutoCloseable {
+    // 用于在内存中存储数据的异步缓存对象
     private final AsyncCache<String, byte[]> memoryCache;
+
+    // Redis 客户端。
+    private RedisClient redisClient;
+    // Redis 连接。
+    private StatefulRedisConnection<byte[], byte[]> statefulRedisConnection;
+    // Redis 是可用的。
+    private boolean redisAvailabled = false;
 
     /**
      * 创建一个新的混合缓存实例。
      */
     public HybridCache() {
         this(new HybridCacheOptions());
+    }
+
+    /**
+     * 创建一个新的混合缓存实例。
+     * @param optionsAction 用于配置混合缓存。
+     */
+    public HybridCache(Consumer<HybridCacheOptions> optionsAction) {
+        this(Optional.ofNullable(optionsAction).map(x -> {
+            HybridCacheOptions options = new HybridCacheOptions();
+            if (optionsAction != null) {
+                optionsAction.accept(options);
+            }
+
+            return options;
+        }).get());
     }
 
     /**
@@ -33,6 +62,15 @@ public class HybridCache {
             .maximumSize(options.getSizeLimit())
             .expireAfterWrite(options.getExpirationScanFrequency())
             .buildAsync();
+
+        try {
+            RedisCacheOptions redisCacheOptions = options.getRedisCacheOptions();
+            this.redisClient = RedisClient.create("redis://" + redisCacheOptions.getConfiguration());
+            this.statefulRedisConnection = redisClient.connect(new ByteArrayCodec());
+            this.redisAvailabled = this.statefulRedisConnection.isOpen();
+        } catch (Exception e) {
+            // ignore
+        }
     }
 
     /**
@@ -41,9 +79,20 @@ public class HybridCache {
      * @return 所处位置的值或 {@code null}。
      */
     public byte[] get(String key) {
-        CompletableFuture<byte[]> future = this.memoryCache.getIfPresent(key);
-        if (future != null) {
-            return future.join();
+        CompletableFuture<byte[]> completableFuture = this.memoryCache.getIfPresent(key);
+        if (completableFuture != null) {
+            return completableFuture.join();
+        }
+
+        if (redisAvailabled) {
+            RedisFuture<byte[]> redisFuture = this.statefulRedisConnection.async().get(key.getBytes(StandardCharsets.UTF_8));
+            if (redisFuture != null) {
+                try {
+                    return redisFuture.get();
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
         }
 
         return null;
@@ -72,6 +121,21 @@ public class HybridCache {
      * 用给定的键设置一个值。
      * @param key 一个字符串，用于识别所处位置的值。
      * @param value 缓存中要设置的值。
+     * @param entryOptionsAction 值的缓存选项。
+     */
+    public void set(String key, Object value, Consumer<HybridCacheEntryOptions> entryOptionsAction) {
+        HybridCacheEntryOptions entryOptions = new HybridCacheEntryOptions();
+        if (entryOptionsAction != null) {
+            entryOptionsAction.accept(entryOptions);
+        }
+
+        this.set(key, value, entryOptions);
+    }
+
+    /**
+     * 用给定的键设置一个值。
+     * @param key 一个字符串，用于识别所处位置的值。
+     * @param value 缓存中要设置的值。
      * @param entryOptions 值的缓存选项。
      */
     public void set(String key, Object value, HybridCacheEntryOptions entryOptions) {
@@ -80,12 +144,17 @@ public class HybridCache {
         HybridCachePlace place = whereToStore(value, entryOptions);
         assert !place.equals(HybridCachePlace.AUTO);
 
-        if (place.equals(HybridCachePlace.MEMORY)) {
-            memoryCache.put(key, CompletableFuture.completedFuture(bytes));
-            return;
+        if (place.equals(HybridCachePlace.DISTRIBUTED)) {
+            if (redisAvailabled) {
+                RedisAsyncCommands<byte[], byte[]> asyncCommands = this.statefulRedisConnection.async();
+                SetArgs setArgs = SetArgs.Builder
+                    .ex(entryOptions.getAbsoluteExpiration());
+                asyncCommands.set(key.getBytes(StandardCharsets.UTF_8), bytes, setArgs);
+                return;
+            }
         }
 
-        // TODO: Method not implemented.
+        this.memoryCache.put(key, CompletableFuture.completedFuture(bytes));
     }
 
     /**
@@ -93,7 +162,14 @@ public class HybridCache {
      * @param key 一个字符串，用于识别所处位置的值。
      */
     public void refresh(String key) {
-        this.memoryCache.synchronous().getIfPresent(key);
+        if (this.memoryCache.synchronous().getIfPresent(key) != null) {
+            return;
+        }
+
+        if (redisAvailabled) {
+            RedisAsyncCommands<byte[], byte[]> asyncCommands = this.statefulRedisConnection.async();
+            asyncCommands.expire(key.getBytes(StandardCharsets.UTF_8), 60);
+        }
     }
 
     /**
@@ -102,6 +178,11 @@ public class HybridCache {
      */
     public void remove(String key) {
         this.memoryCache.synchronous().invalidate(key);
+
+        if (redisAvailabled) {
+            RedisAsyncCommands<byte[], byte[]> asyncCommands = this.statefulRedisConnection.async();
+            asyncCommands.del(key.getBytes(StandardCharsets.UTF_8));
+        }
     }
 
     /**
@@ -113,7 +194,7 @@ public class HybridCache {
         try {
             return clazz.isAssignableFrom(String.class)
                 ? clazz.cast(new String(bytes, StandardCharsets.UTF_8))
-                : clazz.cast(TypeUtils.fromBytes(bytes));
+                : clazz.cast(TypeUtils.fromBytes(bytes, clazz));
         } catch (Exception e) {
             return null;
         }
@@ -145,12 +226,21 @@ public class HybridCache {
             return options.getCachePlace();
         }
 
-        if (value == null) {
+        if (value == null || options.getPriority().equals(CacheItemPriority.HIGH)) {
             return HybridCachePlace.MEMORY;
         }
 
-        return options.getPriority().equals(CacheItemPriority.HIGH)
-            ? HybridCachePlace.MEMORY
-            : HybridCachePlace.DISTRIBUTED;
+        return HybridCachePlace.DISTRIBUTED;
+    }
+
+    // Closes this resource, relinquishing any underlying resources.
+    @Override
+    public void close() {
+        if (this.statefulRedisConnection != null && redisAvailabled) {
+            this.statefulRedisConnection.close();
+        }
+        if (this.redisClient != null) {
+            this.redisClient.shutdown();
+        }
     }
 }

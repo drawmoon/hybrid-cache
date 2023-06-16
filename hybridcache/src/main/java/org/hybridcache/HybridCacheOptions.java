@@ -4,9 +4,9 @@ import java.time.Duration;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hybridcache.hybridobs.HybridStoreOption;
 
 public class HybridCacheOptions {
-
     /**
      * 获取或设置缓冲区的最大尺寸。
      */
@@ -20,4 +20,18 @@ public class HybridCacheOptions {
     @Getter
     @Setter
     private Duration expirationScanFrequency = Duration.ofMinutes(10);
+
+    /**
+     * Redis 缓存的配置选项。
+     */
+    @Getter
+    @Setter
+    private RedisCacheOptions redisCacheOptions = new RedisCacheOptions();
+
+    /**
+     * 
+     */
+    @Getter
+    @Setter
+    private HybridStoreOption hybridStoreOption = new HybridStoreOption();
 }
