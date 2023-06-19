@@ -5,7 +5,7 @@ package org.hybridcache.hybridobs;
  */
 public enum HybridStorePlace {
     /**
-     * 表示 {@link HybridOBS} 应该自动选择存储位置。
+     * 表示 {@link HybridOBS} 应该自动选择缓存位置。
      */
     AUTO,
 

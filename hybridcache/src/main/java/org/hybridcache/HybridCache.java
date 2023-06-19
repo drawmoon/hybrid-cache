@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import org.hybridcache.hybridobs.HybridStore;
 import org.hybridcache.utils.TypeUtils;
 
 import com.github.benmanes.caffeine.cache.AsyncCache;
@@ -21,7 +22,7 @@ import io.lettuce.core.codec.ByteArrayCodec;
  * 一个混合缓存，它将数据存储在内存、磁盘、分布式对象存储和分布式缓存上。
  */
 public class HybridCache implements AutoCloseable {
-    // 用于在内存中存储数据的异步缓存对象
+    // 用于在内存中存储数据的异步缓存对象。
     private final AsyncCache<String, byte[]> memoryCache;
 
     // Redis 客户端。
@@ -30,6 +31,9 @@ public class HybridCache implements AutoCloseable {
     private StatefulRedisConnection<byte[], byte[]> statefulRedisConnection;
     // Redis 是可用的。
     private boolean redisAvailable = false;
+
+    // 用于在磁盘或分布式对象存储的缓存对象。
+    private HybridStore hybridStore;
 
     /**
      * 创建一个新的混合缓存实例。
@@ -69,6 +73,8 @@ public class HybridCache implements AutoCloseable {
         } catch (Exception e) {
             // ignore
         }
+
+        this.hybridStore = new HybridStore(options.getHybridStoreOption());
     }
 
     /**
@@ -93,7 +99,7 @@ public class HybridCache implements AutoCloseable {
             }
         }
 
-        return null;
+        return this.hybridStore.get(key);
     }
 
     /**
@@ -150,6 +156,8 @@ public class HybridCache implements AutoCloseable {
                 asyncCommands.set(key.getBytes(StandardCharsets.UTF_8), bytes, setArgs);
                 return;
             }
+
+            this.hybridStore.put(key, bytes, "hybridcache");
         }
 
         this.memoryCache.put(key, CompletableFuture.completedFuture(bytes));
@@ -180,6 +188,8 @@ public class HybridCache implements AutoCloseable {
         if (redisAvailable) {
             RedisAsyncCommands<byte[], byte[]> asyncCommands = this.statefulRedisConnection.async();
             asyncCommands.del(key.getBytes(StandardCharsets.UTF_8));
+        } else {
+            this.hybridStore.remove(key);
         }
     }
 
