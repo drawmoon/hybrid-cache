@@ -27,7 +27,7 @@ import io.minio.RemoveObjectArgs;
  * 一个混合存储，它将数据存储在磁盘、分布式对象存储上。
  */
 public class HybridStore {
-    // 
+    // 用于混合存储的配置选项。
     private HybridStoreOption options;
 
     // Minio 客户端。
