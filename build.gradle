@@ -19,9 +19,25 @@ allprojects {
 }
 
 subprojects {
+  apply plugin: 'java-library'
+
   repositories {
+    // Use Maven Local for resolving dependencies.
+    mavenLocal()
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+  }
+
+  dependencies {
+    // Use Apache common library.
+    api 'org.apache.commons:commons-lang3:3.9'
+
+    // Use Lombok library.
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+
+    // Use JUnit test framework.
+    testImplementation 'junit:junit:4.13.2'
   }
 
   // Apply a specific Java toolchain to ease working on different environments.
@@ -48,19 +64,23 @@ project(':hybridcache') {
     api project(':hybridobs')
 
     // Use Caffeine cache library.
-    implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
+    api 'com.github.ben-manes.caffeine:caffeine:2.9.3'
     // Use Lettuce cache library.
-    implementation 'io.lettuce:lettuce-core:6.2.4.RELEASE'
+    api 'io.lettuce:lettuce-core:6.2.4.RELEASE'
+  }
 
-    // Use Apache common library.
-    implementation 'org.apache.commons:commons-lang3:3.9'
+  java {
+    withJavadocJar()
+    withSourcesJar()
+  }
 
-    // Use Lombok library.
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+  javadoc.options {
+    encoding = 'UTF-8'
+    links 'https://docs.oracle.com/javase/8/docs/api/'
+  }
 
-    // Use JUnit test framework.
-    testImplementation 'junit:junit:4.13.2'
+  artifacts {
+    archives javadocJar, sourcesJar
   }
 
   publishing {
@@ -110,17 +130,21 @@ project(':hybridobs') {
 
   dependencies {
     // Use Minio library.
-    implementation 'io.minio:minio:8.5.3'
+    api 'io.minio:minio:8.5.3'
+  }
 
-    // Use Apache common library.
-    implementation 'org.apache.commons:commons-lang3:3.9'
+  java {
+    withJavadocJar()
+    withSourcesJar()
+  }
 
-    // Use Lombok library.
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+  javadoc.options {
+    encoding = 'UTF-8'
+    links 'https://docs.oracle.com/javase/8/docs/api/'
+  }
 
-    // Use JUnit test framework.
-    testImplementation 'junit:junit:4.13.2'
+  artifacts {
+    archives javadocJar, sourcesJar
   }
 
   publishing {
