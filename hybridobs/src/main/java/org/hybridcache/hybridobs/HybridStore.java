@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import io.minio.BucketExistsArgs;
 import io.minio.GetObjectArgs;
+import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
@@ -89,17 +90,23 @@ public class HybridStore {
     public byte[] get(String key) {
         String realPath = this.getRealPath(key);
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            byte[] bytes = new byte[4096];
             InputStream inputStream;
+            int byteSize = 0;
             if (this.options.getStorePlace().equals(HybridStorePlace.LOCAL)) {
                 inputStream = new BufferedInputStream(Files.newInputStream(Paths.get(realPath)));
+                byteSize = inputStream.available();
             } else {
-                inputStream = minioClient.getObject(GetObjectArgs.builder()
+                GetObjectResponse response = minioClient.getObject(GetObjectArgs.builder()
                     .bucket(this.options.getBucket())
                     .region(this.options.getRegion())
                     .object(realPath)
                     .build());
+
+                inputStream = response;
+                byteSize = Integer.parseInt(response.headers().get("Content-Length"));
             }
+
+            byte[] bytes = new byte[byteSize];
 
             int length;
             while ((length = inputStream.read(bytes)) != -1) {
