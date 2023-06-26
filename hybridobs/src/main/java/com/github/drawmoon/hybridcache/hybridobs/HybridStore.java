@@ -1,4 +1,4 @@
-package org.hybridcache.hybridobs;
+package com.github.drawmoon.hybridcache.hybridobs;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

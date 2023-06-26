@@ -1,4 +1,4 @@
-package org.hybridcache.hybridobs;
+package com.github.drawmoon.hybridcache.hybridobs;
 
 /**
  * 表示 {@link HybridStore} 的缓存位置。

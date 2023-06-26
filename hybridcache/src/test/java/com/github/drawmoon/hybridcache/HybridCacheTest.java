@@ -1,4 +1,4 @@
-package org.hybridcache;
+package com.github.drawmoon.hybridcache;
 
 import org.junit.Test;
 
