@@ -1,4 +1,4 @@
-package com.github.drawmoon.hybridcache;
+package io.github.drawmoon.hybridcache;
 
 /**
  * 表示 {@link HybridCache} 的缓存位置。

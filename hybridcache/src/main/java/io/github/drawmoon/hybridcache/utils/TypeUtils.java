@@ -1,4 +1,4 @@
-package com.github.drawmoon.hybridcache.utils;
+package io.github.drawmoon.hybridcache.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

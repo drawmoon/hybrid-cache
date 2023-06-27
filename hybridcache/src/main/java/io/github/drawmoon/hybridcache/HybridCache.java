@@ -1,12 +1,12 @@
-package com.github.drawmoon.hybridcache;
+package io.github.drawmoon.hybridcache;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import com.github.drawmoon.hybridcache.hybridobs.HybridStore;
-import com.github.drawmoon.hybridcache.utils.TypeUtils;
+import io.github.drawmoon.hybridcache.hybridobs.HybridStore;
+import io.github.drawmoon.hybridcache.utils.TypeUtils;
 
 import com.github.benmanes.caffeine.cache.AsyncCache;
 import com.github.benmanes.caffeine.cache.Caffeine;

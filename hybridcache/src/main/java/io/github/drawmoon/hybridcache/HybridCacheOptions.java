@@ -1,10 +1,10 @@
-package com.github.drawmoon.hybridcache;
+package io.github.drawmoon.hybridcache;
 
 import java.time.Duration;
 
 import lombok.Getter;
 import lombok.Setter;
-import com.github.drawmoon.hybridcache.hybridobs.HybridStoreOption;
+import io.github.drawmoon.hybridcache.hybridobs.HybridStoreOption;
 
 public class HybridCacheOptions {
     /**

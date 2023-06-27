@@ -1,4 +1,4 @@
-package com.github.drawmoon.hybridcache.hybridobs;
+package io.github.drawmoon.hybridcache.hybridobs;
 
 import lombok.Getter;
 import lombok.Setter;

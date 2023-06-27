@@ -13,7 +13,7 @@ plugins {
 }
 
 allprojects {
-  group = 'com.github.drawmoon.hybridcache'
+  group = 'io.github.drawmoon.hybridcache'
   description = 'A hybrid caching library'
   version = '0.0.1'
 }

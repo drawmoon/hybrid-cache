@@ -1,4 +1,4 @@
-package com.github.drawmoon.hybridcache;
+package io.github.drawmoon.hybridcache;
 
 /**
  * 指定在内存压力触发的清理中如何优先保存项目。
