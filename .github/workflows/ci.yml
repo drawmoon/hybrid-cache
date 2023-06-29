@@ -13,22 +13,37 @@ on:
   pull_request:
     branches: [ "main" ]
 
-permissions:
-  contents: read
-
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    name: Test on JDK ${{ matrix.java-version }} and ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        java-version: [ '8', '11', '17' ]
+        os: [ ubuntu-latest, windows-latest, macOS-latest ]
 
     steps:
+    # Checkout the repo
     - uses: actions/checkout@v3
-    - name: Set up JDK 8
+    
+    # Set up JDK 8, 11, or 17
+    - name: Set up JDK ${{ matrix.java-version }}
       uses: actions/setup-java@v3
       with:
-        java-version: '8'
+        java-version: ${{ matrix.java-version }}
         distribution: 'temurin'
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-      with:
-        arguments: build
+    
+    # Build with Gradle on Ubuntu, Windows, or macOS
+    - name: Build with Gradle on Ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      run: sh ./gradlew build
+    
+    - name: Build with Gradle on Windows
+      if: matrix.os == 'windows-latest'
+      run: .\gradlew build
+    
+    - name: Build with Gradle on macOS
+      if: matrix.os == 'macOS-latest'
+      run: sh ./gradlew build
