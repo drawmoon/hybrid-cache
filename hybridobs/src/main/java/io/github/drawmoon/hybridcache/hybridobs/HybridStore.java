@@ -106,6 +106,10 @@ public class HybridStore {
                 byteSize = Integer.parseInt(response.headers().get("Content-Length"));
             }
 
+            if (byteSize == 0) {
+                return new byte[0];
+            }
+
             byte[] bytes = new byte[byteSize];
 
             int length;
