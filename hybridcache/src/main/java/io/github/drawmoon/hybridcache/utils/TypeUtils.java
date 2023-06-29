@@ -26,6 +26,7 @@ public class TypeUtils {
 
     /**
      * 将字节数组转换为对象。
+     * @param <T> 转换为对象的对象类型。
      * @param bytes 待转换的字节数组。
      * @param clazz 转换为对象的对象类型。
      * @return 转换后的对象。

@@ -104,7 +104,9 @@ public class HybridCache implements AutoCloseable {
 
     /**
      * 获取一个具有给定键的值。
+     * @param <T> 要返回的值的类型。
      * @param key 一个字符串，用于识别所处位置的值。
+     * @param clazz 要返回的值的类型。
      * @return 所处位置的值或 {@code null}。
      */
     public <T> T get(String key, Class<T> clazz) {
