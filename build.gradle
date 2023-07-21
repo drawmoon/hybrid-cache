@@ -20,6 +20,7 @@ project(':hybridcache') {
 
   version = '0.0.1'
   archivesBaseName = 'hybridcache'
+  group = 'io.github.drawmoon.hybridcache'
 
   sourceCompatibility = JavaVersion.VERSION_1_8
   targetCompatibility = JavaVersion.VERSION_1_8
@@ -87,7 +88,7 @@ project(':hybridcache') {
         plugin(MavenPublication) {
           from components.java
           artifactId = archivesBaseName
-          groupId = 'io.github.drawmoon.hybridcache'
+          groupId = group
           version = version
           pom {
             name = archivesBaseName
