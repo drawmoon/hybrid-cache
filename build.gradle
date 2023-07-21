@@ -12,127 +12,42 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
-allprojects {
-  group = 'io.github.drawmoon.hybridcache'
-  description = 'A hybrid caching library'
-  version = '0.0.1'
-}
-
-subprojects {
-  apply plugin: 'java-library'
-
-  repositories {
-    mavenLocal()
-    mavenCentral()
-  }
-
-  dependencies {
-    // Use Apache common library.
-    api 'org.apache.commons:commons-lang3:3.9'
-
-    // Use Lombok library.
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
-
-    // Use JUnit test framework.
-    testImplementation 'junit:junit:4.13.2'
-  }
-
-  java {
-    toolchain {
-      languageVersion = JavaLanguageVersion.of(8)
-    }
-  }
-
-  [compileJava, compileTestJava].each() {
-    it.options.encoding = "UTF-8"
-  }
-}
-
-// Hybridcache module gradle build settings
 project(':hybridcache') {
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
   apply plugin: 'com.github.johnrengelman.shadow'
 
   archivesBaseName = 'hybridcache'
+  group = 'io.github.drawmoon.hybridcache'
+  description = 'A hybrid caching library'
+  version = '0.0.1'
 
   dependencies {
-    // Use Hybridobs cache library.
-    api project(':hybridobs')
+    implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
+    implementation 'io.lettuce:lettuce-core:6.2.4.RELEASE'
+    implementation 'io.minio:minio:8.5.3'
+    implementation 'org.apache.commons:commons-lang3:3.9'
+    implementation 'de.undercouch:bson4jackson:2.13.1'
+    
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
-    // Use Caffeine cache library.
-    api 'com.github.ben-manes.caffeine:caffeine:2.9.3'
-    // Use Lettuce cache library.
-    api 'io.lettuce:lettuce-core:6.2.4.RELEASE'
+    testImplementation 'junit:junit:4.13.2'
+  }
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+
+  [compileJava, compileTestJava].each() {
+    it.options.encoding = "UTF-8"
   }
 
   java {
-    withJavadocJar()
-    withSourcesJar()
-  }
-
-  javadoc.options {
-    encoding = 'UTF-8'
-    links 'https://docs.oracle.com/javase/8/docs/api/'
-  }
-
-  artifacts {
-    archives javadocJar, sourcesJar, shadowJar
-  }
-
-  publishing {
-    publications {
-      mavenJava(MavenPublication) {
-        artifactId = archivesBaseName
-        from components.java
-        pom {
-          name = archivesBaseName
-          packaging = 'jar'
-          description = description
-          url = 'https://github.com/drawmoon/hybrid-cache'
-          inceptionYear = '2023'
-          
-          licenses {
-            license {
-              name = 'MIT License'
-              url = 'https://opensource.org/licenses/MIT'
-            }
-          }
-
-          scm {
-            connection = 'scm:git:git@github.com:drawmoon/hybrid-cache.git'
-            developerConnection = 'scm:git:git@github.com:drawmoon/hybrid-cache.git'
-            url = 'https://github.com/drawmoon/hybrid-cache'
-          }
-          
-          developers {
-            developer {
-              id = 'drash'
-              name = 'drawmoon'
-              email = '1340260725@qq.com'
-            }
-          }
-        }
-      }
+    toolchain {
+      languageVersion = JavaLanguageVersion.of(8)
     }
-  }
-}
-
-// Hybridobs module gradle build settings
-project(':hybridobs') {
-  apply plugin: 'java-library'
-  apply plugin: 'maven-publish'
-  apply plugin: 'com.github.johnrengelman.shadow'
-
-  archivesBaseName = 'hybridobs'
-
-  dependencies {
-    // Use Minio library.
-    api 'io.minio:minio:8.5.3'
-  }
-
-  java {
     withJavadocJar()
     withSourcesJar()
   }

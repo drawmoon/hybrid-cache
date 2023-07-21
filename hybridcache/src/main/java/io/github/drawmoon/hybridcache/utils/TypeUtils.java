@@ -1,10 +1,10 @@
 package io.github.drawmoon.hybridcache.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.undercouch.bson4jackson.BsonFactory;
 
 public class TypeUtils {
     /**
@@ -18,10 +18,8 @@ public class TypeUtils {
             return (byte[]) value;
         }
 
-        ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOutputStream);
-        objectOutputStream.writeObject(value);
-        return byteOutputStream.toByteArray();
+        ObjectMapper mapper = new ObjectMapper(new BsonFactory());
+        return mapper.writeValueAsBytes(value);
     }
 
     /**
@@ -38,8 +36,7 @@ public class TypeUtils {
             return clazz.cast(bytes);
         }
 
-        ByteArrayInputStream byteInputStream = new ByteArrayInputStream(bytes);
-        ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream);
-        return clazz.cast(objectInputStream.readObject());
+        ObjectMapper mapper = new ObjectMapper(new BsonFactory());
+        return mapper.readValue(bytes, clazz);
     }
 }

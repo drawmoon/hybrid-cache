@@ -4,7 +4,6 @@ import java.time.Duration;
 
 import lombok.Getter;
 import lombok.Setter;
-import io.github.drawmoon.hybridcache.hybridobs.HybridStoreOption;
 
 public class HybridCacheOptions {
     /**

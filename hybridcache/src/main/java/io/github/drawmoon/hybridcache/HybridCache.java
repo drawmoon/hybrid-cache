@@ -5,12 +5,10 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import io.github.drawmoon.hybridcache.hybridobs.HybridStore;
-import io.github.drawmoon.hybridcache.utils.TypeUtils;
-
 import com.github.benmanes.caffeine.cache.AsyncCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
+import io.github.drawmoon.hybridcache.utils.TypeUtils;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisFuture;
 import io.lettuce.core.SetArgs;
