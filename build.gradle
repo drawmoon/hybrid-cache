@@ -7,9 +7,9 @@
  */
 
 plugins {
-    // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
     id 'maven-publish'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 allprojects {
@@ -22,9 +22,7 @@ subprojects {
   apply plugin: 'java-library'
 
   repositories {
-    // Use Maven Local for resolving dependencies.
     mavenLocal()
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
   }
 
@@ -40,7 +38,6 @@ subprojects {
     testImplementation 'junit:junit:4.13.2'
   }
 
-  // Apply a specific Java toolchain to ease working on different environments.
   java {
     toolchain {
       languageVersion = JavaLanguageVersion.of(8)
@@ -56,6 +53,7 @@ subprojects {
 project(':hybridcache') {
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
+  apply plugin: 'com.github.johnrengelman.shadow'
 
   archivesBaseName = 'hybridcache'
 
@@ -80,7 +78,7 @@ project(':hybridcache') {
   }
 
   artifacts {
-    archives javadocJar, sourcesJar
+    archives javadocJar, sourcesJar, shadowJar
   }
 
   publishing {
@@ -125,6 +123,7 @@ project(':hybridcache') {
 project(':hybridobs') {
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
+  apply plugin: 'com.github.johnrengelman.shadow'
 
   archivesBaseName = 'hybridobs'
 
@@ -144,7 +143,7 @@ project(':hybridobs') {
   }
 
   artifacts {
-    archives javadocJar, sourcesJar
+    archives javadocJar, sourcesJar, shadowJar
   }
 
   publishing {

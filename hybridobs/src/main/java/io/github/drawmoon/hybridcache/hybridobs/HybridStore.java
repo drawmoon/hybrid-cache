@@ -170,7 +170,7 @@ public class HybridStore {
                 Files.createDirectories(path.getParent());
 
                 try (BufferedOutputStream outputStream = new BufferedOutputStream(
-                    Files.newOutputStream(path, StandardOpenOption.CREATE_NEW))) {
+                    Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
                     outputStream.write(data);
                 }
             } else {
