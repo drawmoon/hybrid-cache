@@ -38,12 +38,12 @@ jobs:
     # Build with Gradle on Ubuntu, Windows, or macOS
     - name: Build with Gradle on Ubuntu
       if: matrix.os == 'ubuntu-latest'
-      run: sh ./gradlew build
+      run: sh ./gradlew build -Prelease
     
     - name: Build with Gradle on Windows
       if: matrix.os == 'windows-latest'
-      run: .\gradlew build
+      run: .\gradlew build -Prelease
     
     - name: Build with Gradle on macOS
       if: matrix.os == 'macOS-latest'
-      run: sh ./gradlew build
+      run: sh ./gradlew build -Prelease

@@ -76,7 +76,9 @@ project(':hybridcache') {
   }
 
   signing {
-    sign configurations.archives
+    if (project.properties.containsKey('signing.keyId')) {
+      sign configurations.archives
+    }
   }
 
   afterEvaluate {
