@@ -28,6 +28,7 @@ project(':hybridcache') {
     implementation 'io.minio:minio:8.5.3'
     implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'de.undercouch:bson4jackson:2.13.1'
+    implementation 'com.aventrix.jnanoid:jnanoid:2.0.0'
     
     compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'

@@ -12,10 +12,11 @@ import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 
 import io.minio.BucketExistsArgs;
 import io.minio.GetObjectArgs;
@@ -242,7 +243,7 @@ public class HybridStore {
         }
 
         String key = Paths
-            .get(baseDir, area, format.format(new Date()), UUID.randomUUID().toString(), filename)
+            .get(baseDir, area, format.format(new Date()), NanoIdUtils.randomNanoId(), filename)
             .toString();
         if (StringUtils.isNotBlank(this.options.getKeyPrefix())) {
             return this.options.getKeyPrefix() + key;
