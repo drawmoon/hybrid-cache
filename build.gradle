@@ -129,6 +129,14 @@ project(':hybridcache') {
               password = project.properties['nexusPassword']
           }
         }
+        maven {
+          name = "ossrh-snapshots"
+          url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+          credentials {
+              username = project.properties['nexusUsername']
+              password = project.properties['nexusPassword']
+          }
+        }
       }
     }
   }
