@@ -1,14 +1,13 @@
 package io.github.drawmoon.hybridcache;
 
-import org.junit.Test;
-
 import static org.junit.Assert.*;
 
 import java.io.File;
+import org.junit.Test;
 
 public class HybridStoreTest {
     @Test
-     public void testStroeText() {
+    public void testStroeText() {
         HybridStore hybridStore = new HybridStore(x -> {
             x.setKeyPrefix("disk:");
         });
@@ -22,10 +21,10 @@ public class HybridStoreTest {
 
         hybridStore.remove(key);
         assertFalse(new File(key.substring(5)).exists());
-     }
+    }
 
-     @Test
-     public void testStroeEmptyText() {
+    @Test
+    public void testStroeEmptyText() {
         HybridStore hybridStore = new HybridStore(x -> {
             x.setKeyPrefix("disk:");
         });
@@ -39,10 +38,10 @@ public class HybridStoreTest {
 
         hybridStore.remove(key);
         assertFalse(new File(key.substring(5)).exists());
-     }
+    }
 
-     @Test
-     public void testMinioStroeText() {
+    @Test
+    public void testMinioStroeText() {
         HybridStore hybridStore = new HybridStore(x -> {
             x.setStorePlace(HybridStorePlace.DISTRIBUTED);
             x.setConfiguration("http://127.0.0.1:9000");
@@ -60,10 +59,10 @@ public class HybridStoreTest {
 
         hybridStore.remove(key);
         assertNull(hybridStore.get(key));
-     }
+    }
 
-     @Test
-     public void testMinioStroeEmptyText() {
+    @Test
+    public void testMinioStroeEmptyText() {
         HybridStore hybridStore = new HybridStore(x -> {
             x.setStorePlace(HybridStorePlace.DISTRIBUTED);
             x.setConfiguration("http://127.0.0.1:9000");
@@ -81,5 +80,5 @@ public class HybridStoreTest {
 
         hybridStore.remove(key);
         assertNull(hybridStore.get(key));
-     }
+    }
 }

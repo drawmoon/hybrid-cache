@@ -1,13 +1,7 @@
 package io.github.drawmoon.hybridcache;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-
 import com.github.benmanes.caffeine.cache.AsyncCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-
 import io.github.drawmoon.hybridcache.utils.TypeUtils;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisFuture;
@@ -15,6 +9,10 @@ import io.lettuce.core.SetArgs;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.codec.ByteArrayCodec;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * 一个混合缓存，它将数据存储在内存、磁盘、分布式对象存储和分布式缓存上。
@@ -46,11 +44,12 @@ public class HybridCache implements AutoCloseable {
      */
     public HybridCache(Consumer<HybridCacheOptions> optionsAction) {
         this(Optional.ofNullable(optionsAction)
-            .map(x -> {
-                HybridCacheOptions options = new HybridCacheOptions();
-                x.accept(options);
-                return options;
-            }).orElseGet(HybridCacheOptions::new));
+                .map(x -> {
+                    HybridCacheOptions options = new HybridCacheOptions();
+                    x.accept(options);
+                    return options;
+                })
+                .orElseGet(HybridCacheOptions::new));
     }
 
     /**
@@ -59,9 +58,9 @@ public class HybridCache implements AutoCloseable {
      */
     public HybridCache(HybridCacheOptions options) {
         this.memoryCache = Caffeine.newBuilder()
-            .maximumSize(options.getSizeLimit())
-            .expireAfterWrite(options.getExpirationScanFrequency())
-            .buildAsync();
+                .maximumSize(options.getSizeLimit())
+                .expireAfterWrite(options.getExpirationScanFrequency())
+                .buildAsync();
 
         try {
             RedisCacheOptions redisCacheOptions = options.getRedisCacheOptions();
@@ -87,7 +86,8 @@ public class HybridCache implements AutoCloseable {
         }
 
         if (redisAvailable) {
-            RedisFuture<byte[]> redisFuture = this.statefulRedisConnection.async().get(key.getBytes(StandardCharsets.UTF_8));
+            RedisFuture<byte[]> redisFuture =
+                    this.statefulRedisConnection.async().get(key.getBytes(StandardCharsets.UTF_8));
             if (redisFuture != null) {
                 try {
                     return redisFuture.get();
@@ -151,8 +151,7 @@ public class HybridCache implements AutoCloseable {
         if (place.equals(HybridCachePlace.DISTRIBUTED)) {
             if (redisAvailable) {
                 RedisAsyncCommands<byte[], byte[]> asyncCommands = this.statefulRedisConnection.async();
-                SetArgs setArgs = SetArgs.Builder
-                    .ex(entryOptions.getAbsoluteExpiration());
+                SetArgs setArgs = SetArgs.Builder.ex(entryOptions.getAbsoluteExpiration());
                 asyncCommands.set(key.getBytes(StandardCharsets.UTF_8), bytes, setArgs);
                 return;
             }
@@ -201,8 +200,8 @@ public class HybridCache implements AutoCloseable {
     private <T> T convertFromBytes(byte[] bytes, Class<T> clazz) {
         try {
             return clazz.isAssignableFrom(String.class)
-                ? clazz.cast(new String(bytes, StandardCharsets.UTF_8))
-                : clazz.cast(TypeUtils.fromBytes(bytes, clazz));
+                    ? clazz.cast(new String(bytes, StandardCharsets.UTF_8))
+                    : clazz.cast(TypeUtils.fromBytes(bytes, clazz));
         } catch (Exception e) {
             return null;
         }
@@ -216,8 +215,8 @@ public class HybridCache implements AutoCloseable {
     private byte[] convertToBytes(Object value) {
         try {
             return value instanceof String
-                ? ((String) value).getBytes(StandardCharsets.UTF_8)
-                : TypeUtils.toBytes(value);
+                    ? ((String) value).getBytes(StandardCharsets.UTF_8)
+                    : TypeUtils.toBytes(value);
         } catch (Exception e) {
             return null;
         }

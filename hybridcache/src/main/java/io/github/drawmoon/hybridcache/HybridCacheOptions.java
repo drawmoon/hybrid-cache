@@ -1,7 +1,6 @@
 package io.github.drawmoon.hybridcache;
 
 import java.time.Duration;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,7 +27,7 @@ public class HybridCacheOptions {
     private RedisCacheOptions redisCacheOptions = new RedisCacheOptions();
 
     /**
-     * 
+     *
      */
     @Getter
     @Setter

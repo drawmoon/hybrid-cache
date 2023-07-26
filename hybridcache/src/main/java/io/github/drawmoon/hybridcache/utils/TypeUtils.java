@@ -1,10 +1,8 @@
 package io.github.drawmoon.hybridcache.utils;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.undercouch.bson4jackson.BsonFactory;
+import java.io.IOException;
 
 public class TypeUtils {
     /**

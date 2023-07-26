@@ -17,28 +17,28 @@ public class HybridStoreOption {
     @Getter
     @Setter
     private String configuration;
-    
+
     /**
      * 表示认证信息。
      */
     @Getter
     @Setter
     private String auth;
-    
+
     /**
      * 表示认证密码。
      */
     @Getter
     @Setter
     private String password;
-    
+
     /**
      * 表示存储区域。
      */
     @Getter
     @Setter
     private String region = "us-east-1";
-    
+
     /**
      * 表示存储桶名称。
      * <p>

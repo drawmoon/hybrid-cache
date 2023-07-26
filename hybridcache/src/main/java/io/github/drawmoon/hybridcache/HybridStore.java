@@ -1,5 +1,12 @@
 package io.github.drawmoon.hybridcache;
 
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import io.minio.BucketExistsArgs;
+import io.minio.GetObjectArgs;
+import io.minio.GetObjectResponse;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -13,17 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 import java.util.function.Consumer;
-
 import org.apache.commons.lang3.StringUtils;
-
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
-
-import io.minio.BucketExistsArgs;
-import io.minio.GetObjectArgs;
-import io.minio.GetObjectResponse;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
 
 /**
  * 一个混合存储，它将数据存储在磁盘、分布式对象存储上。
@@ -48,11 +45,12 @@ public class HybridStore {
      */
     public HybridStore(Consumer<HybridStoreOption> optionsAction) {
         this(Optional.ofNullable(optionsAction)
-            .map(x -> {
-                HybridStoreOption options = new HybridStoreOption();
-                x.accept(options);
-                return options;
-            }).orElseGet(HybridStoreOption::new));
+                .map(x -> {
+                    HybridStoreOption options = new HybridStoreOption();
+                    x.accept(options);
+                    return options;
+                })
+                .orElseGet(HybridStoreOption::new));
     }
 
     /**
@@ -64,15 +62,15 @@ public class HybridStore {
         if (!options.getStorePlace().equals(HybridStorePlace.LOCAL)) {
             try {
                 this.minioClient = MinioClient.builder()
-                    .endpoint(options.getConfiguration())
-                    .region(options.getRegion())
-                    .credentials(options.getAuth(), options.getPassword())
-                    .build();
+                        .endpoint(options.getConfiguration())
+                        .region(options.getRegion())
+                        .credentials(options.getAuth(), options.getPassword())
+                        .build();
 
                 if (!this.minioClient.bucketExists(BucketExistsArgs.builder()
-                    .bucket(options.getBucket())
-                    .region(options.getRegion())
-                    .build())) {
+                        .bucket(options.getBucket())
+                        .region(options.getRegion())
+                        .build())) {
                     this.options.setStorePlace(HybridStorePlace.LOCAL);
                 }
 
@@ -98,10 +96,10 @@ public class HybridStore {
                 byteSize = inputStream.available();
             } else {
                 GetObjectResponse response = minioClient.getObject(GetObjectArgs.builder()
-                    .bucket(this.options.getBucket())
-                    .region(this.options.getRegion())
-                    .object(realPath)
-                    .build());
+                        .bucket(this.options.getBucket())
+                        .region(this.options.getRegion())
+                        .object(realPath)
+                        .build());
 
                 inputStream = response;
                 byteSize = Integer.parseInt(response.headers().get("Content-Length"));
@@ -171,7 +169,7 @@ public class HybridStore {
                 Files.createDirectories(path.getParent());
 
                 try (BufferedOutputStream outputStream = new BufferedOutputStream(
-                    Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
+                        Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
                     outputStream.write(data);
                 }
             } else {
@@ -182,8 +180,7 @@ public class HybridStore {
                             .object(realPath)
                             .stream(inputStream, inputStream.available(), -1)
                             .contentType(contentType)
-                            .build()
-                    );
+                            .build());
                 }
             }
         } catch (Exception e) {
@@ -215,10 +212,10 @@ public class HybridStore {
                 Files.delete(Paths.get(realPath));
             } else {
                 this.minioClient.removeObject(RemoveObjectArgs.builder()
-                    .bucket(this.options.getBucket())
-                    .region(this.options.getRegion())
-                    .object(realPath)
-                    .build());
+                        .bucket(this.options.getBucket())
+                        .region(this.options.getRegion())
+                        .object(realPath)
+                        .build());
             }
         } catch (Exception e) {
             // ignore
@@ -235,16 +232,13 @@ public class HybridStore {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
         // 如果没有指定目录，则获取系统的临时目录
-        String baseDir = this.options.getStorePlace().equals(HybridStorePlace.LOCAL)
-            ? this.options.getBucket()
-            : "";
+        String baseDir = this.options.getStorePlace().equals(HybridStorePlace.LOCAL) ? this.options.getBucket() : "";
         if (StringUtils.isBlank(baseDir)) {
             baseDir = System.getProperty("java.io.tmpdir");
         }
 
-        String key = Paths
-            .get(baseDir, area, format.format(new Date()), NanoIdUtils.randomNanoId(), filename)
-            .toString();
+        String key = Paths.get(baseDir, area, format.format(new Date()), NanoIdUtils.randomNanoId(), filename)
+                .toString();
         if (StringUtils.isNotBlank(this.options.getKeyPrefix())) {
             return this.options.getKeyPrefix() + key;
         }
