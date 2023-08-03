@@ -89,34 +89,40 @@ public class HybridStore {
     public byte[] get(String key) {
         String realPath = this.getRealPath(key);
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            InputStream inputStream;
-            int byteSize = 0;
-            if (this.options.getStorePlace().equals(HybridStorePlace.LOCAL)) {
-                inputStream = new BufferedInputStream(Files.newInputStream(Paths.get(realPath)));
-                byteSize = inputStream.available();
-            } else {
-                GetObjectResponse response = minioClient.getObject(GetObjectArgs.builder()
-                        .bucket(this.options.getBucket())
-                        .region(this.options.getRegion())
-                        .object(realPath)
-                        .build());
+            InputStream inputStream = null;
+            try {
+                int byteSize = 0;
+                if (this.options.getStorePlace().equals(HybridStorePlace.LOCAL)) {
+                    inputStream = new BufferedInputStream(Files.newInputStream(Paths.get(realPath)));
+                    byteSize = inputStream.available();
+                } else {
+                    GetObjectResponse response = minioClient.getObject(GetObjectArgs.builder()
+                            .bucket(this.options.getBucket())
+                            .region(this.options.getRegion())
+                            .object(realPath)
+                            .build());
 
-                inputStream = response;
-                byteSize = Integer.parseInt(response.headers().get("Content-Length"));
+                    inputStream = response;
+                    byteSize = Integer.parseInt(response.headers().get("Content-Length"));
+                }
+
+                if (byteSize == 0) {
+                    return new byte[0];
+                }
+
+                byte[] bytes = new byte[byteSize];
+
+                int length;
+                while ((length = inputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, length);
+                }
+
+                return outputStream.toByteArray();
+            } finally {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
             }
-
-            if (byteSize == 0) {
-                return new byte[0];
-            }
-
-            byte[] bytes = new byte[byteSize];
-
-            int length;
-            while ((length = inputStream.read(bytes)) != -1) {
-                outputStream.write(bytes, 0, length);
-            }
-
-            return outputStream.toByteArray();
         } catch (Exception e) {
             // ignore
         }

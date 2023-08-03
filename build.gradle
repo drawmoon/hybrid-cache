@@ -34,7 +34,7 @@ project(':hybridcache') {
     implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'de.undercouch:bson4jackson:2.13.1'
     implementation 'com.aventrix.jnanoid:jnanoid:2.0.0'
-    
+
     compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
@@ -111,7 +111,7 @@ project(':hybridcache') {
             description = 'A hybrid caching library'
             url = 'https://github.com/drawmoon/hybrid-cache'
             inceptionYear = '2023'
-            
+
             licenses {
               license {
                 name = 'MIT License'
@@ -124,7 +124,7 @@ project(':hybridcache') {
               developerConnection = 'scm:git:git@github.com:drawmoon/hybrid-cache.git'
               url = 'https://github.com/drawmoon/hybrid-cache'
             }
-            
+
             developers {
               developer {
                 id = 'drash'
