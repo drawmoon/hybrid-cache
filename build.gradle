@@ -7,32 +7,31 @@
  */
 
 plugins {
-  id 'java-library'
-  id 'maven-publish'
-  id "com.github.johnrengelman.shadow" version "7.1.2"
-  id 'com.diffplug.spotless' version '6.13.0'
+    id 'java-library'
+    id 'maven-publish'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id 'com.diffplug.spotless' version '6.13.0'
 }
 
-project(':hybridcache') {
-  apply plugin: 'java-library'
-  apply plugin: 'maven-publish'
-  apply plugin: 'signing'
-  apply plugin: 'com.github.johnrengelman.shadow'
-  apply plugin: 'com.diffplug.spotless'
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.diffplug.spotless'
 
-  version = '0.0.1'
-  archivesBaseName = 'hybridcache'
-  group = 'io.github.drawmoon.hybridcache'
+version = '0.0.1-SNAPSHOT'
+archivesBaseName = 'hybridcache'
+group = 'io.github.drawmoon.hybridcache'
 
-  sourceCompatibility = JavaVersion.VERSION_1_8
-  targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
-  repositories {
+repositories {
     mavenLocal()
     mavenCentral()
-  }
+}
 
-  dependencies {
+dependencies {
     implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
     implementation 'io.lettuce:lettuce-core:6.2.4.RELEASE'
     implementation 'io.minio:minio:8.5.3'
@@ -46,122 +45,121 @@ project(':hybridcache') {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-  }
+}
 
-  test {
+test {
     useJUnitPlatform()
     testLogging {
-      events "passed", "skipped", "failed"
+        events "passed", "skipped", "failed"
     }
-  }
+}
 
-  [compileJava, compileTestJava].each() {
+[compileJava, compileTestJava].each() {
     it.options.encoding = "UTF-8"
-  }
+}
 
-  spotless {
+spotless {
     java {
-      target '**/*.java'
-      importOrder 'edu', 'com', 'io', 'java', 'javax', 'org', ''
-      removeUnusedImports()
-      trimTrailingWhitespace()
-      palantirJavaFormat()
+        target '**/*.java'
+        importOrder 'edu', 'com', 'io', 'java', 'javax', 'org', ''
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        palantirJavaFormat()
     }
     groovyGradle {
-      target '*.gradle'
+        target '*.gradle'
     }
-  }
+}
 
-  jar {
+jar {
     manifest {
-      attributes('Implementation-Title': archivesBaseName,
-              'Implementation-Version': version,
-              'Built-By': 'drash',
-              'Built-JDK': System.getProperty('java.version'),
-              'Source-Compatibility': sourceCompatibility,
-              'Target-Compatibility': targetCompatibility)
+        attributes('Implementation-Title': archivesBaseName,
+                    'Implementation-Version': version,
+                    'Built-By': 'drash',
+                    'Built-JDK': System.getProperty('java.version'),
+                    'Source-Compatibility': sourceCompatibility,
+                    'Target-Compatibility': targetCompatibility)
     }
-  }
+}
 
-  java {
+java {
     toolchain {
-      languageVersion = JavaLanguageVersion.of(8)
+        languageVersion = JavaLanguageVersion.of(8)
     }
     withJavadocJar()
     withSourcesJar()
-  }
+}
 
-  javadoc.options {
+javadoc.options {
     encoding = 'UTF-8'
     links 'https://docs.oracle.com/javase/8/docs/api/'
-  }
+}
 
-  artifacts {
+artifacts {
     archives javadocJar, sourcesJar, shadowJar
-  }
+}
 
-  signing {
+signing {
     if (project.properties.containsKey('signing.keyId')) {
-      sign configurations.archives
+        sign configurations.archives
     }
-  }
+}
 
-  afterEvaluate {
+afterEvaluate {
     publishing {
-      publications {
-        plugin(MavenPublication) {
-          from components.java
-          artifactId = archivesBaseName
-          groupId = group
-          version = version
-          pom {
-            name = archivesBaseName
-            packaging = 'jar'
-            description = 'A hybrid caching library'
-            url = 'https://github.com/drawmoon/hybrid-cache'
-            inceptionYear = '2023'
+        publications {
+            plugin(MavenPublication) {
+                from components.java
+                artifactId = archivesBaseName
+                groupId = group
+                version = version
+                pom {
+                    name = archivesBaseName
+                    packaging = 'jar'
+                    description = 'A hybrid caching library'
+                    url = 'https://github.com/drawmoon/hybrid-cache'
+                    inceptionYear = '2023'
 
-            licenses {
-              license {
-                name = 'MIT License'
-                url = 'https://opensource.org/licenses/MIT'
-              }
-            }
+                    licenses {
+                        license {
+                            name = 'MIT License'
+                            url = 'https://opensource.org/licenses/MIT'
+                        }
+                    }
 
-            scm {
-              connection = 'scm:git:git@github.com:drawmoon/hybrid-cache.git'
-              developerConnection = 'scm:git:git@github.com:drawmoon/hybrid-cache.git'
-              url = 'https://github.com/drawmoon/hybrid-cache'
-            }
+                    scm {
+                        connection = 'scm:git:git@github.com:drawmoon/hybrid-cache.git'
+                        developerConnection = 'scm:git:git@github.com:drawmoon/hybrid-cache.git'
+                        url = 'https://github.com/drawmoon/hybrid-cache'
+                    }
 
-            developers {
-              developer {
-                id = 'drash'
-                name = 'drawmoon'
-                email = '1340260725@qq.com'
-              }
+                    developers {
+                        developer {
+                            id = 'drash'
+                            name = 'drawmoon'
+                            email = '1340260725@qq.com'
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-      repositories {
-        maven {
-          name = "ossrh"
-          url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-          credentials {
-              username = project.properties['nexusUsername']
-              password = project.properties['nexusPassword']
-          }
+        repositories {
+            maven {
+                name = "ossrh"
+                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                credentials {
+                    username = project.properties['nexusUsername']
+                    password = project.properties['nexusPassword']
+                }
+            }
+            maven {
+                name = "ossrh-snapshots"
+                url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                credentials {
+                    username = project.properties['nexusUsername']
+                    password = project.properties['nexusPassword']
+                }
+            }
         }
-        maven {
-          name = "ossrh-snapshots"
-          url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-          credentials {
-              username = project.properties['nexusUsername']
-              password = project.properties['nexusPassword']
-          }
-        }
-      }
     }
-  }
 }
