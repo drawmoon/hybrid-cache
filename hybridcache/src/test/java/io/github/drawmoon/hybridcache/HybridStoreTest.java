@@ -1,13 +1,13 @@
 package io.github.drawmoon.hybridcache;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HybridStoreTest {
     @Test
-    public void testStroeText() {
+    public void testStoreText() {
         HybridStore hybridStore = new HybridStore(x -> {
             x.setKeyPrefix("disk:");
         });
@@ -24,7 +24,7 @@ public class HybridStoreTest {
     }
 
     @Test
-    public void testStroeEmptyText() {
+    public void testStoreEmptyText() {
         HybridStore hybridStore = new HybridStore(x -> {
             x.setKeyPrefix("disk:");
         });
@@ -41,12 +41,12 @@ public class HybridStoreTest {
     }
 
     @Test
-    public void testMinioStroeText() {
+    public void testMinIOStoreText() {
         HybridStore hybridStore = new HybridStore(x -> {
             x.setStorePlace(HybridStorePlace.DISTRIBUTED);
             x.setConfiguration("http://127.0.0.1:9000");
-            x.setAuth("AKIAIOSFODNN7EXAMPLE");
-            x.setPassword("wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY");
+            x.setAuth("minio");
+            x.setPassword("minio");
             x.setBucket("default");
             x.setKeyPrefix("minio:");
         });
@@ -62,12 +62,12 @@ public class HybridStoreTest {
     }
 
     @Test
-    public void testMinioStroeEmptyText() {
+    public void testMinIOStoreEmptyText() {
         HybridStore hybridStore = new HybridStore(x -> {
             x.setStorePlace(HybridStorePlace.DISTRIBUTED);
             x.setConfiguration("http://127.0.0.1:9000");
             x.setAuth("AKIAIOSFODNN7EXAMPLE");
-            x.setPassword("wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY");
+            x.setPassword("minio");
             x.setBucket("default");
             x.setKeyPrefix("minio:");
         });

@@ -27,6 +27,11 @@ project(':hybridcache') {
   sourceCompatibility = JavaVersion.VERSION_1_8
   targetCompatibility = JavaVersion.VERSION_1_8
 
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+
   dependencies {
     implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
     implementation 'io.lettuce:lettuce-core:6.2.4.RELEASE'
@@ -38,12 +43,16 @@ project(':hybridcache') {
     compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
   }
 
-  repositories {
-    mavenLocal()
-    mavenCentral()
+  test {
+    useJUnitPlatform()
+    testLogging {
+      events "passed", "skipped", "failed"
+    }
   }
 
   [compileJava, compileTestJava].each() {
