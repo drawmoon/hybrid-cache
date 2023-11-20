@@ -17,6 +17,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+// gradle version: 8.1.1
 plugins {
     id 'java-library'
     id 'maven-publish'
@@ -55,7 +56,6 @@ dependencies {
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-
 }
 
 test {
@@ -73,6 +73,7 @@ spotless {
     java {
         target '**/*.java'
         importOrder 'edu', 'com', 'io', 'java', 'javax', 'org', ''
+
         removeUnusedImports()
         trimTrailingWhitespace()
         palantirJavaFormat()
@@ -94,16 +95,17 @@ jar {
 }
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
     withJavadocJar()
     withSourcesJar()
 }
 
 javadoc.options {
     encoding = 'UTF-8'
-    links 'https://docs.oracle.com/javase/8/docs/api/'
+    if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+        links 'https://docs.oracle.com/javase/8/docs/api/'
+    } else {
+        links 'https://docs.oracle.com/en/java/javase/11/docs/api/'
+    }
 }
 
 artifacts {
