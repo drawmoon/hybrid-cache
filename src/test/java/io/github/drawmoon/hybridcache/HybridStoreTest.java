@@ -21,6 +21,8 @@ package io.github.drawmoon.hybridcache;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 
 public class HybridStoreTest {
@@ -30,12 +32,12 @@ public class HybridStoreTest {
             x.setKeyPrefix("disk:");
         });
 
-        String key = hybridStore.put("tmp.txt", "abc".getBytes());
+        String key = hybridStore.put("tmp.txt", "abc".getBytes(StandardCharsets.UTF_8));
         assertTrue(key.startsWith("disk:"));
         assertTrue(new File(key.substring(5)).exists());
 
         byte[] bytes = hybridStore.get(key);
-        assertEquals("abc", new String(bytes));
+        assertEquals("abc", new String(bytes, StandardCharsets.UTF_8));
 
         hybridStore.remove(key);
         assertFalse(new File(key.substring(5)).exists());
@@ -47,12 +49,12 @@ public class HybridStoreTest {
             x.setKeyPrefix("disk:");
         });
 
-        String key = hybridStore.put("tmp.txt", "".getBytes());
+        String key = hybridStore.put("tmp.txt", "".getBytes(StandardCharsets.UTF_8));
         assertTrue(key.startsWith("disk:"));
         assertTrue(new File(key.substring(5)).exists());
 
         byte[] bytes = hybridStore.get(key);
-        assertEquals("", new String(bytes));
+        assertEquals("", new String(bytes, StandardCharsets.UTF_8));
 
         hybridStore.remove(key);
         assertFalse(new File(key.substring(5)).exists());
@@ -69,14 +71,14 @@ public class HybridStoreTest {
             x.setKeyPrefix("minio:");
         });
 
-        String key = hybridStore.put("tmp.txt", "abc".getBytes());
+        String key = hybridStore.put("tmp.txt", "abc".getBytes(StandardCharsets.UTF_8));
         assertTrue(key.startsWith("minio:"));
 
         byte[] bytes = hybridStore.get(key);
-        assertEquals("abc", new String(bytes));
+        assertEquals("abc", new String(bytes, StandardCharsets.UTF_8));
 
         hybridStore.remove(key);
-        assertNull(hybridStore.get(key));
+        assertTrue(ArrayUtils.isEmpty(hybridStore.get(key)));
     }
 
     @Test
@@ -90,13 +92,13 @@ public class HybridStoreTest {
             x.setKeyPrefix("minio:");
         });
 
-        String key = hybridStore.put("tmp.txt", "".getBytes());
+        String key = hybridStore.put("tmp.txt", "".getBytes(StandardCharsets.UTF_8));
         assertTrue(key.startsWith("minio:"));
 
         byte[] bytes = hybridStore.get(key);
-        assertEquals("", new String(bytes));
+        assertEquals("", new String(bytes, StandardCharsets.UTF_8));
 
         hybridStore.remove(key);
-        assertNull(hybridStore.get(key));
+        assertTrue(ArrayUtils.isEmpty(hybridStore.get(key)));
     }
 }

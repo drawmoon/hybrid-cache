@@ -236,7 +236,7 @@ public class HybridCache implements AutoCloseable {
                     ? ((String) value).getBytes(StandardCharsets.UTF_8)
                     : TypeUtils.toBytes(value);
         } catch (Exception e) {
-            return null;
+            return new byte[0];
         }
     }
 

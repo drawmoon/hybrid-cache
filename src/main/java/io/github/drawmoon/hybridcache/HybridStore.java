@@ -145,7 +145,7 @@ public class HybridStore {
             // ignore
         }
 
-        return null;
+        return new byte[0];
     }
 
     /**
